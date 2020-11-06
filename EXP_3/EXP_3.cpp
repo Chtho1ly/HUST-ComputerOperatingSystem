@@ -12,15 +12,15 @@
 #define ADDR "."
 #define SOURCE_FILE "./source.txt"
 #define DEST_FILE "./destination.txt"
-#define BUF_LEN 16
-#define LIST_LEN 4
+#define BUF_LEN 20
+#define LIST_LEN 8
 
 using namespace std;
 
 struct node
 {
 	node *next;
-	char data[BUF_LEN];
+	char *data;
 	int len;
 	bool last;
 };
@@ -82,7 +82,7 @@ int read_Process()
 	head = (node *)shmat(idMem, 0, 0);
 	//读功能实现
 	ofstream streamRead;
-	streamRead.open(DEST_FILE,ios::binary);
+	streamRead.open(DEST_FILE, ios::binary);
 	if (!streamRead.is_open())
 	{
 		printf("Fail in opening destination.txt\n");
@@ -119,8 +119,12 @@ int main()
 	//初始化链表指针结构
 	node *cur = head;
 	for (int i = 0; i < LIST_LEN - 1; cur += sizeof(node), i++)
+	{
 		cur->next = cur + sizeof(node);
+		cur->data = new char(BUF_LEN);
+	}
 	cur->next = head;
+	cur->data = new char(BUF_LEN);
 	//写信号灯，初值为0
 	key_t keyWrite = ftok(ADDR, 0x01);
 	idWrite = create_Sem(keyWrite, 1);
