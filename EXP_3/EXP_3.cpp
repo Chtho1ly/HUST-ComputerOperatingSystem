@@ -26,11 +26,22 @@ struct node
 };
 
 int idWrite, idRead;
-key_t keyMem;
+key_t keyMem, keyPtr;
 
 int write_Process()
 {
 	//绑定共享内存
+	//声明指针部分内存
+	int idPtr;
+	char *headPtr;
+	idPtr = shmget(keyPtr, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	if (idPtr == -1)
+	{
+		fprintf(stderr, "shmat read Ptr failed\n");
+		exit(EXIT_FAILURE);
+	}
+	headPtr = (char *)shmat(idPtr, 0, 0);
+	//声明数据部分内存
 	int idMem;
 	node *head;
 	idMem = shmget(keyMem, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
@@ -71,12 +82,23 @@ int write_Process()
 int read_Process()
 {
 	//绑定共享内存
+	//声明指针部分内存
+	int idPtr;
+	char *headPtr;
+	idPtr = shmget(keyPtr, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	if (idPtr == -1)
+	{
+		fprintf(stderr, "shmat read Ptr failed\n");
+		exit(EXIT_FAILURE);
+	}
+	headPtr = (char *)shmat(idPtr, 0, 0);
+	//声明数据部分内存
 	int idMem;
 	node *head;
-	idMem = shmget(keyMem, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
+	idMem = shmget(keyMem, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
 	if (idMem == -1)
 	{
-		fprintf(stderr, "shmat read failed\n");
+		fprintf(stderr, "shmat read Data failed\n");
 		exit(EXIT_FAILURE);
 	}
 	head = (node *)shmat(idMem, 0, 0);
@@ -105,26 +127,40 @@ int read_Process()
 
 int main()
 {
+	//绑定共享内存
+	//声明指针部分内存
+	int idPtr;
+	char *headData;
+	keyPtr = ftok(ADDR, 0x10);
+	idPtr = shmget(keyPtr, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	if (idPtr == -1)
+	{
+		fprintf(stderr, "shmat main Ptr failed\n");
+		exit(EXIT_FAILURE);
+	}
+	headData = (char *)shmat(idPtr, 0, 0);
+	//声明数据部分内存
 	int idMem;
 	node *head;
-	keyMem = ftok(ADDR, 0x10);
+	keyMem = ftok(ADDR, 0x11);
 	idMem = shmget(keyMem, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
 	cout << idMem << endl;
 	if (idMem == -1)
 	{
-		fprintf(stderr, "shmat main failed\n");
+		fprintf(stderr, "shmat main Data failed\n");
 		exit(EXIT_FAILURE);
 	}
 	head = (node *)shmat(idMem, 0, 0);
 	//初始化链表指针结构
 	node *cur = head;
-	for (int i = 0; i < LIST_LEN - 1; cur += sizeof(node), i++)
+	char *curData = headData;
+	for (int i = 0; i < LIST_LEN - 1; cur += sizeof(node), curData += sizeof(char) * BUF_LEN, i++)
 	{
 		cur->next = cur + sizeof(node);
-		cur->data = new char(BUF_LEN);
+		cur->data = curData;
 	}
 	cur->next = head;
-	cur->data = new char(BUF_LEN);
+	cur->data = curData;
 	//写信号灯，初值为0
 	key_t keyWrite = ftok(ADDR, 0x01);
 	idWrite = create_Sem(keyWrite, 1);
