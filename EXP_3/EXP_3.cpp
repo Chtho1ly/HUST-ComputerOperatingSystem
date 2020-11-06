@@ -12,8 +12,8 @@
 #define ADDR "."
 #define SOURCE_FILE "./source.txt"
 #define DEST_FILE "./destination.txt"
-#define BUF_LEN 20
-#define LIST_LEN 8
+#define BUF_LEN 64
+#define LIST_LEN 16
 
 using namespace std;
 
@@ -34,7 +34,7 @@ int write_Process()
 	//声明指针部分内存
 	int idPtr;
 	char *headPtr;
-	idPtr = shmget(keyPtr, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	idPtr = shmget(keyPtr, sizeof(char) * LIST_LEN, 0666 | IPC_CREAT);
 	if (idPtr == -1)
 	{
 		fprintf(stderr, "shmat read Ptr failed\n");
@@ -44,7 +44,7 @@ int write_Process()
 	//声明数据部分内存
 	int idMem;
 	node *head;
-	idMem = shmget(keyMem, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
+	idMem = shmget(keyMem, sizeof(node) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
 	if (idMem == -1)
 	{
 		fprintf(stderr, "shmat write failed\n");
@@ -85,7 +85,7 @@ int read_Process()
 	//声明指针部分内存
 	int idPtr;
 	char *headPtr;
-	idPtr = shmget(keyPtr, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	idPtr = shmget(keyPtr, sizeof(char) * LIST_LEN, 0666 | IPC_CREAT);
 	if (idPtr == -1)
 	{
 		fprintf(stderr, "shmat read Ptr failed\n");
@@ -132,7 +132,7 @@ int main()
 	int idPtr;
 	char *headData;
 	keyPtr = ftok(ADDR, 0x10);
-	idPtr = shmget(keyPtr, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	idPtr = shmget(keyPtr, sizeof(char) * LIST_LEN, 0666 | IPC_CREAT);
 	if (idPtr == -1)
 	{
 		fprintf(stderr, "shmat main Ptr failed\n");
@@ -143,7 +143,7 @@ int main()
 	int idMem;
 	node *head;
 	keyMem = ftok(ADDR, 0x11);
-	idMem = shmget(keyMem, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
+	idMem = shmget(keyMem, sizeof(node) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
 	cout << idMem << endl;
 	if (idMem == -1)
 	{
