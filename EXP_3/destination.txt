@@ -9,4 +9,18 @@
 #include <sys/wait.h>
 #include "sem.h"
 
-#define ADDR "./EXP_3"
+#define ADDR "."
+#define SOURCE_FILE "./source.txt"
+#define DEST_FILE "./destination.txt"
+#define BUF_LEN 64
+#define LIST_LEN 16
+
+using namespace std;
+
+struct node
+{
+	node *next;
+	char *data;
+	int len;
+	bool last;
+};

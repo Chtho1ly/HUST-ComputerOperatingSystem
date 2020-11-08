@@ -4,8 +4,8 @@
 #include <sys/types.h>
 #include "sem.h"
 #define ADDR "./EXP_2"
-#define WINDOW_NUM 4
-#define TICKET_NUM 100
+#define WINDOW_NUM 5
+#define TICKET_NUM 1000
 
 using namespace std;
 
