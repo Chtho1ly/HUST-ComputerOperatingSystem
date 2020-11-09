@@ -80,6 +80,7 @@ void get_rwx(const struct dirent *item, const struct stat *buf, char *rwx)
 		rwx[9] = 'x';
 	else
 		rwx[9] = '-';
+		rwx[10] = 0;
 }
 
 void printDir(string path, int depth)
@@ -87,7 +88,7 @@ void printDir(string path, int depth)
 	DIR *cur = opendir(path.c_str());
 	if (cur == NULL)
 	{
-		cout << "Error" << endl;
+		cout << "Error opening " << path << endl;
 		return;
 	}
 	chdir(path.c_str());
@@ -113,7 +114,7 @@ void printDir(string path, int depth)
 			cout << pw->pw_name << " ";
 			cout << gr->gr_name << " ";
 			//cout << "inode:" << item->d_ino << " ";
-			printf("%08ld ",info.st_size);
+			printf("%08ld ", info.st_size);
 			//cout  << info.st_size << " ";
 			//cout << "LastAccess:" << accessTime << " ";
 			cout << modifyTime << " ";
@@ -128,10 +129,13 @@ void printDir(string path, int depth)
 	return;
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	string path;
-	path = ".";
-	printDir(path.c_str(), 0);
+	if (argc == 1)
+		printDir(".", 0);
+	else
+		printDir(argv[1], 0);
+	//printDir(path.c_str(), 0);
 	return 0;
 }
