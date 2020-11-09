@@ -12,7 +12,7 @@
 #define ADDR "."
 #define SOURCE_FILE "./source"
 #define DEST_FILE "./destination"
-#define BUF_LEN 32
+#define BUF_LEN 16
 #define LIST_LEN 8
 
 using namespace std;
@@ -64,8 +64,9 @@ int write_Process()
 		P(idWrite, 0);
 		streamWrite.read(head->data, BUF_LEN - 1);
 		head->len = streamWrite.gcount();
+		head->data[head->len] = 0;
 		head->last = false;
-		//cout << head->len << ": " << head->data << endl;
+		cout << head->len << ": " << head->data << endl;
 		//cout << head->data;
 		if (streamWrite.eof())
 		{
