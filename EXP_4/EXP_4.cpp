@@ -100,7 +100,7 @@ void printDir(string path, int depth)
 		{
 			stat(item->d_name, &info);
 			for (int i = 0; i < depth; i++)
-				cout << "    ";
+				cout << "|————";
 			char rwx[11];
 			get_rwx(item, &info, rwx);
 			struct passwd *pw = getpwuid(info.st_uid);
@@ -114,7 +114,7 @@ void printDir(string path, int depth)
 			cout << pw->pw_name << " ";
 			cout << gr->gr_name << " ";
 			//cout << "inode:" << item->d_ino << " ";
-			printf("%08ld ", info.st_size);
+			printf("%8ld ", info.st_size);
 			//cout  << info.st_size << " ";
 			//cout << "LastAccess:" << accessTime << " ";
 			cout << modifyTime << " ";

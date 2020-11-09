@@ -10,9 +10,9 @@
 #include "sem.h"
 
 #define ADDR "."
-#define SOURCE_FILE "./source"
-#define DEST_FILE "./destination"
-#define BUF_LEN 16
+#define SOURCE_FILE "./source.pptx"
+#define DEST_FILE "./destination.pptx"
+#define BUF_LEN 512
 #define LIST_LEN 8
 
 using namespace std;
@@ -53,7 +53,7 @@ int write_Process()
 	head = (node *)shmat(idMem, 0, 0);
 	//写功能实现ifstream streamWrite;
 	ifstream streamWrite;
-	streamWrite.open(SOURCE_FILE);
+	streamWrite.open(SOURCE_FILE,ios_base::binary);
 	if (!streamWrite.is_open())
 	{
 		printf("Fail in opening source.txt\n");
@@ -66,7 +66,7 @@ int write_Process()
 		head->len = streamWrite.gcount();
 		head->data[head->len] = 0;
 		head->last = false;
-		cout << head->len << ": " << head->data << endl;
+		//cout << head->len << ": " << head->data << endl;
 		//cout << head->data;
 		if (streamWrite.eof())
 		{
@@ -106,7 +106,7 @@ int read_Process()
 	head = (node *)shmat(idMem, 0, 0);
 	//读功能实现
 	ofstream streamRead;
-	streamRead.open(DEST_FILE);
+	streamRead.open(DEST_FILE,ios_base::binary);
 	if (!streamRead.is_open())
 	{
 		printf("Fail in opening destination.txt\n");

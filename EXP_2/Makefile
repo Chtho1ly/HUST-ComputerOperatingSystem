@@ -1,4 +1,4 @@
-name = EXP_2
+name = EXP_2_1
 objects = $(name).o
 
 test : $(objects)
