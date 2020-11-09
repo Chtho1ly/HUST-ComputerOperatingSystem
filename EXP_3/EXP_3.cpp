@@ -10,10 +10,10 @@
 #include "sem.h"
 
 #define ADDR "."
-#define SOURCE_FILE "./source.txt"
-#define DEST_FILE "./destination.txt"
-#define BUF_LEN 64
-#define LIST_LEN 16
+#define SOURCE_FILE "./source"
+#define DEST_FILE "./destination"
+#define BUF_LEN 32
+#define LIST_LEN 8
 
 using namespace std;
 
@@ -53,7 +53,7 @@ int write_Process()
 	head = (node *)shmat(idMem, 0, 0);
 	//写功能实现ifstream streamWrite;
 	ifstream streamWrite;
-	streamWrite.open(SOURCE_FILE, ios_base::binary);
+	streamWrite.open(SOURCE_FILE);
 	if (!streamWrite.is_open())
 	{
 		printf("Fail in opening source.txt\n");
@@ -62,10 +62,11 @@ int write_Process()
 	while (true)
 	{
 		P(idWrite, 0);
-		streamWrite.read(head->data, BUF_LEN);
+		streamWrite.read(head->data, BUF_LEN - 1);
 		head->len = streamWrite.gcount();
 		head->last = false;
-		cout << head->len << ": " << head->data << endl;
+		//cout << head->len << ": " << head->data << endl;
+		//cout << head->data;
 		if (streamWrite.eof())
 		{
 			head->last = true;
@@ -104,7 +105,7 @@ int read_Process()
 	head = (node *)shmat(idMem, 0, 0);
 	//读功能实现
 	ofstream streamRead;
-	streamRead.open(DEST_FILE, ios::binary);
+	streamRead.open(DEST_FILE);
 	if (!streamRead.is_open())
 	{
 		printf("Fail in opening destination.txt\n");
