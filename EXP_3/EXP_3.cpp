@@ -12,8 +12,8 @@
 #define ADDR "."
 #define SOURCE_FILE "./source.pptx"
 #define DEST_FILE "./destination.pptx"
-#define BUF_LEN 2
-#define LIST_LEN 4
+#define BUF_LEN 512
+#define LIST_LEN 8
 
 using namespace std;
 
