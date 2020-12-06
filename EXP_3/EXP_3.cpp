@@ -12,8 +12,8 @@
 #define ADDR "."
 #define SOURCE_FILE "./source.pptx"
 #define DEST_FILE "./destination.pptx"
-#define BUF_LEN 512
-#define LIST_LEN 8
+#define BUF_LEN 2
+#define LIST_LEN 4
 
 using namespace std;
 
@@ -26,31 +26,31 @@ struct node
 };
 
 int idWrite, idRead;
-key_t keyMem, keyPtr;
+key_t keyPtr, keyData;
 
 int write_Process()
 {
 	//绑定共享内存
-	//声明指针部分内存
-	int idPtr;
-	char *headPtr;
-	idPtr = shmget(keyPtr, sizeof(char) * LIST_LEN, 0666 | IPC_CREAT);
-	if (idPtr == -1)
+	//声明数据部分内存
+	int idData;
+	char *headData;
+	idData = shmget(keyData, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
+	if (idData == -1)
 	{
-		fprintf(stderr, "shmat read Ptr failed\n");
+		fprintf(stderr, "shmat read Data failed\n");
 		exit(EXIT_FAILURE);
 	}
-	headPtr = (char *)shmat(idPtr, 0, 0);
-	//声明数据部分内存
-	int idMem;
+	headData = (char *)shmat(idData, 0, 0);
+	//声明指针部分内存
+	int idPtr;
 	node *head;
-	idMem = shmget(keyMem, sizeof(node) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
-	if (idMem == -1)
+	idPtr = shmget(keyPtr, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
+	if (idPtr == -1)
 	{
 		fprintf(stderr, "shmat write failed\n");
 		exit(EXIT_FAILURE);
 	}
-	head = (node *)shmat(idMem, 0, 0);
+	head = (node *)shmat(idPtr, 0, 0);
 	//写功能实现ifstream streamWrite;
 	ifstream streamWrite;
 	streamWrite.open(SOURCE_FILE,ios_base::binary);
@@ -84,26 +84,26 @@ int write_Process()
 int read_Process()
 {
 	//绑定共享内存
-	//声明指针部分内存
-	int idPtr;
-	char *headPtr;
-	idPtr = shmget(keyPtr, sizeof(char) * LIST_LEN, 0666 | IPC_CREAT);
-	if (idPtr == -1)
-	{
-		fprintf(stderr, "shmat read Ptr failed\n");
-		exit(EXIT_FAILURE);
-	}
-	headPtr = (char *)shmat(idPtr, 0, 0);
 	//声明数据部分内存
-	int idMem;
-	node *head;
-	idMem = shmget(keyMem, sizeof(char) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
-	if (idMem == -1)
+	int idData;
+	char *headData;
+	idData = shmget(keyData, sizeof(char) * BUF_LEN *  LIST_LEN, 0666 | IPC_CREAT);
+	if (idData == -1)
 	{
 		fprintf(stderr, "shmat read Data failed\n");
 		exit(EXIT_FAILURE);
 	}
-	head = (node *)shmat(idMem, 0, 0);
+	headData = (char *)shmat(idData, 0, 0);
+	//声明指针部分内存
+	int idPtr;
+	node *head;
+	idPtr = shmget(keyPtr, sizeof(char) *LIST_LEN, 0666 | IPC_CREAT);
+	if (idPtr == -1)
+	{
+		fprintf(stderr, "shmat read Data failed\n");
+		exit(EXIT_FAILURE);
+	}
+	head = (node *)shmat(idPtr, 0, 0);
 	//读功能实现
 	ofstream streamRead;
 	streamRead.open(DEST_FILE,ios_base::binary);
@@ -130,29 +130,29 @@ int read_Process()
 int main()
 {
 	//绑定共享内存
-	//声明指针部分内存
-	int idPtr;
-	char *headData;
-	keyPtr = ftok(ADDR, 0x10);
-	idPtr = shmget(keyPtr, sizeof(char) * LIST_LEN, 0666 | IPC_CREAT);
-	if (idPtr == -1)
-	{
-		fprintf(stderr, "shmat main Ptr failed\n");
-		exit(EXIT_FAILURE);
-	}
-	headData = (char *)shmat(idPtr, 0, 0);
 	//声明数据部分内存
-	int idMem;
-	node *head;
-	keyMem = ftok(ADDR, 0x11);
-	idMem = shmget(keyMem, sizeof(node) * BUF_LEN * LIST_LEN, 0666 | IPC_CREAT);
-	cout << idMem << endl;
-	if (idMem == -1)
+	int idData;
+	char *headData;
+	keyData = ftok(ADDR, 0x10);
+	idData = shmget(keyData, sizeof(char)  * BUF_LEN* LIST_LEN, 0666 | IPC_CREAT);
+	if (idData == -1)
 	{
 		fprintf(stderr, "shmat main Data failed\n");
 		exit(EXIT_FAILURE);
 	}
-	head = (node *)shmat(idMem, 0, 0);
+	headData = (char *)shmat(idData, 0, 0);
+	//声明指针部分内存
+	int idPtr;
+	node *head;
+	keyPtr = ftok(ADDR, 0x11);
+	idPtr = shmget(keyPtr, sizeof(node) * LIST_LEN, 0666 | IPC_CREAT);
+	cout << idPtr << endl;
+	if (idPtr == -1)
+	{
+		fprintf(stderr, "shmat main Data failed\n");
+		exit(EXIT_FAILURE);
+	}
+	head = (node *)shmat(idPtr, 0, 0);
 	//初始化链表指针结构
 	node *cur = head;
 	char *curData = headData;
@@ -188,7 +188,7 @@ int main()
 	int *t;
 	wait(t);
 	wait(t);
-	if (shmctl(idMem, IPC_RMID, 0) == -1)
+	if (shmctl(idPtr, IPC_RMID, 0) == -1)
 	{
 		fprintf(stderr, "shmctl(remive) main failed\n");
 		exit(EXIT_FAILURE);
